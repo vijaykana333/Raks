@@ -157,16 +157,16 @@
                 <div>
                     <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
                         <i class="fa-solid fa-bell-concierge text-amber-600"></i>
-                        <span>Housekeeping & Kitchen Alarm Hub (Cloud Sync Active)</span>
+                        <span>Housekeeping & Kitchen Alarm Hub (Cross-Device Cloud Sync)</span>
                     </h2>
-                    <p class="text-xs text-slate-500">Continuous alarm rings automatically when guests order via mobile data/wifi.</p>
+                    <p class="text-xs text-slate-500">Rings continuously across different mobile phones & networks automatically.</p>
                 </div>
             </div>
 
             <!-- Active Pending Orders -->
             <div class="space-y-3">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-                    <span>Pending Orders (Simultaneous Room Alarms)</span>
+                    <span>Pending Orders (Multi-Device Live Alarms)</span>
                     <span id="active-count-badge" class="bg-rose-50 text-rose-600 border border-rose-200 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Pending</span>
                 </h3>
                 <div id="staff-active-orders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -195,42 +195,57 @@
         </span>
     </footer>
 
-    <!-- JavaScript Logic with Free Cloud JSONBin Sync -->
+    <!-- JavaScript Logic with Free Cross-Device Cloud API -->
     <script>
-        // Free Public JSON storage bin endpoint to sync across mobile data & different networks
-        const API_BIN_URL = "https://api.jsonbin.io/v3/b/65f12345e41b4d34e4000000/latest"; // Fallback to local storage if offline, auto-synced
+        // Using a public free JSON bin API endpoint so different phones sync orders seamlessly over mobile data/wifi
+        const CLOUD_BIN_URL = "https://json.npoint.io/400f8983e299c82c3531"; 
         let currentGuest = null;
         let cart = [];
-        let orders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+        let orders = [];
         let alarmEnabled = true;
         let audioInterval = null;
 
-        // High-frequency Cloud Polling (Every 2 seconds) to sync orders across different networks & mobile data
-        async function fetchCloudOrders() {
+        // Fetch Orders from Cloud API every 2 seconds for Multi-Phone Realtime Sync
+        async function fetchOrdersFromCloud() {
             try {
-                // We use localStorage combined with simulated cloud sync for absolute zero-cost reliability
-                const saved = localStorage.getItem('hotel_orders');
-                if (saved) {
-                    orders = JSON.parse(saved);
+                const response = await fetch(CLOUD_BIN_URL);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        orders = data;
+                        if (localStorage.getItem('is_staff') === 'true') {
+                            renderStaffDashboard();
+                        }
+                        checkAlarmStatus();
+                        if (currentGuest) {
+                            renderGuestOrders();
+                        }
+                    }
                 }
-            } catch(e) {
-                console.log("Sync error:", e);
+            } catch (e) {
+                console.log("Cloud sync fallback:", e);
             }
         }
 
-        setInterval(async () => {
-            await fetchCloudOrders();
-            if(localStorage.getItem('is_staff') === 'true') {
-                renderStaffDashboard();
+        async function saveOrdersToCloud(updatedOrders) {
+            try {
+                await fetch(CLOUD_BIN_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedOrders)
+                });
+                orders = updatedOrders;
+            } catch (e) {
+                console.log("Save error:", e);
             }
-            checkAlarmStatus();
-            if(currentGuest) {
-                renderGuestOrders();
-            }
-        }, 2000);
+        }
 
-        window.onload = function() {
-            if(localStorage.getItem('is_staff') === 'true') {
+        // Poll cloud every 2 seconds
+        setInterval(fetchOrdersFromCloud, 2000);
+
+        window.onload = async function() {
+            await fetchOrdersFromCloud();
+            if (localStorage.getItem('is_staff') === 'true') {
                 openStaffDashboard();
             } else {
                 checkAlarmStatus();
@@ -284,17 +299,17 @@
             const pendingList = orders.filter(o => o.status === 'Pending');
             const activeCountBadge = document.getElementById('active-count-badge');
             
-            if(pendingList.length > 0) {
-                if(!audioInterval && alarmEnabled) {
+            if (pendingList.length > 0) {
+                if (!audioInterval && alarmEnabled) {
                     audioInterval = setInterval(playAlarmBeep, 1200);
                 }
             } else {
-                if(audioInterval) {
+                if (audioInterval) {
                     clearInterval(audioInterval);
                     audioInterval = null;
                 }
             }
-            if(activeCountBadge) {
+            if (activeCountBadge) {
                 activeCountBadge.innerText = `${pendingList.length} Pending`;
             }
         }
@@ -302,13 +317,13 @@
         function toggleAudioAlarm() {
             alarmEnabled = !alarmEnabled;
             const btn = document.getElementById('alarm-toggle-btn');
-            if(alarmEnabled) {
+            if (alarmEnabled) {
                 btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm";
                 btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Alarm Active';
             } else {
                 btn.className = "bg-slate-200 hover:bg-slate-300 text-slate-600 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm";
                 btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Alarm Muted';
-                if(audioInterval) {
+                if (audioInterval) {
                     clearInterval(audioInterval);
                     audioInterval = null;
                 }
@@ -342,7 +357,7 @@
 
         function addToCart(itemName, qty) {
             const existing = cart.find(i => i.name === itemName);
-            if(existing) {
+            if (existing) {
                 existing.qty += qty;
             } else {
                 cart.push({ name: itemName, qty: qty });
@@ -357,7 +372,7 @@
 
         function renderCart() {
             const container = document.getElementById('cart-items-container');
-            if(cart.length === 0) {
+            if (cart.length === 0) {
                 container.innerHTML = '<p class="text-xs text-slate-400 py-3 text-center">No items selected yet. Tap above items.</p>';
                 return;
             }
@@ -372,8 +387,8 @@
             `).join('');
         }
 
-        function submitOrder() {
-            if(cart.length === 0) {
+        async function submitOrder() {
+            if (cart.length === 0) {
                 alert('Please select at least one item first!');
                 return;
             }
@@ -388,10 +403,9 @@
                 status: 'Pending'
             };
 
-            let currentOrders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+            let currentOrders = [...orders];
             currentOrders.unshift(newOrder);
-            localStorage.setItem('hotel_orders', JSON.stringify(currentOrders));
-            orders = currentOrders;
+            await saveOrdersToCloud(currentOrders);
             
             cart = [];
             document.getElementById('custom-note').value = '';
@@ -400,21 +414,21 @@
             checkAlarmStatus();
             
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-            alert('Order sent successfully! Staff alarm triggered.');
+            alert('Order sent successfully! Staff alarm triggered across all phones.');
         }
 
         function renderGuestOrders() {
-            if(!currentGuest) return;
+            if (!currentGuest) return;
             const container = document.getElementById('guest-orders-list');
             const myOrders = orders.filter(o => o.room === currentGuest.room);
-            if(myOrders.length === 0) {
+            if (myOrders.length === 0) {
                 container.innerHTML = '<p class="text-xs text-slate-400">No active orders right now.</p>';
                 return;
             }
             container.innerHTML = myOrders.map(o => {
                 let badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
-                if(o.status === 'Picked Up') badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
-                if(o.status === 'Delivered') badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                if (o.status === 'Picked Up') badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                if (o.status === 'Delivered') badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
 
                 return `
                     <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center text-xs">
@@ -428,13 +442,12 @@
             }).join('');
         }
 
-        function updateOrderStatus(orderId, newStatus) {
-            let currentOrders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+        async function updateOrderStatus(orderId, newStatus) {
+            let currentOrders = [...orders];
             const order = currentOrders.find(o => o.id === orderId);
-            if(order) {
+            if (order) {
                 order.status = newStatus;
-                localStorage.setItem('hotel_orders', JSON.stringify(currentOrders));
-                orders = currentOrders;
+                await saveOrdersToCloud(currentOrders);
                 renderStaffDashboard();
                 checkAlarmStatus();
             }
@@ -447,7 +460,7 @@
             const pendingOrPicked = orders.filter(o => o.status !== 'Delivered');
             const deliveredOrders = orders.filter(o => o.status === 'Delivered');
 
-            if(pendingOrPicked.length === 0) {
+            if (pendingOrPicked.length === 0) {
                 activeContainer.innerHTML = `
                     <div class="bg-white border border-slate-200 rounded-2xl p-6 text-center text-slate-400 col-span-full py-12 shadow-sm">
                         <i class="fa-solid fa-circle-check text-4xl mb-2 text-emerald-500/60"></i>
@@ -469,7 +482,6 @@
                                 <h4 class="font-bold text-sm text-slate-900 mt-2">${o.guestName}</h4>
                                 <div class="mt-2 bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-1">
                                     <ul class="text-xs text-indigo-700 space-y-0.5 font-medium">
-                                        ${o.items.Item ? '' : ''}
                                         ${o.items.map(i => `<li>&bull; ${i.qty}x${i.name}</li>`).join('')}
                                     </ul>
                                     ${o.note !== 'None' ? `<p class="text-xs text-amber-700 mt-1">Note: ${o.note}</p>` : ''}
@@ -493,7 +505,7 @@
                 }).join('');
             }
 
-            if(deliveredOrders.length === 0) {
+            if (deliveredOrders.length === 0) {
                 historyContainer.innerHTML = '<p class="text-xs text-slate-400">No history records yet.</p>';
             } else {
                 historyContainer.innerHTML = deliveredOrders.map(o => `
