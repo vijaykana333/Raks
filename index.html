@@ -7,21 +7,35 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        .transparent-logo {
+            mix-blend-mode: multiply;
+            filter: contrast(1.3) brightness(1.05);
+        }
+        .hotel-bg-card {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)), url('hotel-building.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
     <!-- Top Navigation -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-sm">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-6 py-2 flex justify-between items-center shadow-sm">
+        <!-- Left: Video Logo & Title -->
         <div class="flex items-center space-x-3">
-            <div class="bg-indigo-600 text-white p-2.5 rounded-xl font-bold text-lg flex items-center justify-center shadow-md">
-                <i class="fa-solid fa-hotel"></i>
+            <div class="w-12 h-12 rounded-xl overflow-hidden shadow-md flex items-center justify-center bg-slate-100 border border-slate-200 flex-shrink-0">
+                <video id="logo-video" src="ll22.mp4" autoplay muted playsinline class="w-full h-full object-cover"></video>
             </div>
             <div>
                 <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-wide">Hotel RAKS Tanjore</h1>
                 <p class="text-[11px] text-slate-500" id="header-subtitle">Guest Service QR Portal</p>
             </div>
         </div>
-        <div class="flex items-center space-x-3">
+
+        <!-- Right: Extra Large Clear Logo & Controls -->
+        <div class="flex items-center space-x-4">
             <div id="guest-badge" class="hidden bg-emerald-50 border border-emerald-300 text-emerald-700 text-xs px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-sm">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span id="badge-info">Room 101</span>
@@ -35,34 +49,38 @@
                     Lock Staff Hub
                 </button>
             </div>
+            <!-- Extra Large Clear Logo Image -->
+            <div class="h-14 sm:h-16 flex items-center justify-center flex-shrink-0 bg-transparent">
+                <img src="Gemini_Generated_Image_u2vpbhu2vpbhu2vp.png" alt="Hotel RAKS Logo" class="h-full w-auto object-contain transparent-logo">
+            </div>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="flex-grow p-4 sm:p-6 max-w-6xl mx-auto w-full">
+    <main class="flex-grow p-4 sm:p-6 max-w-7xl mx-auto w-full flex items-center justify-center">
 
         <!-- GUEST VIEW SECTION -->
-        <div id="view-guest" class="space-y-6">
+        <div id="view-guest" class="w-full space-y-6">
             
-            <!-- Login Card -->
-            <div id="guest-login-card" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 max-w-md mx-auto shadow-xl">
+            <!-- Login Card with Real Hotel Building Background -->
+            <div id="guest-login-card" class="hotel-bg-card border border-slate-200 rounded-3xl p-6 sm:p-10 max-w-md mx-auto shadow-2xl backdrop-blur-sm">
                 <div class="text-center mb-6">
-                    <div class="inline-block bg-indigo-50 text-indigo-600 p-3.5 rounded-2xl text-2xl mb-3 shadow-inner">
-                        <i class="fa-solid fa-qrcode"></i>
+                    <div class="inline-block bg-white/80 backdrop-blur-md text-indigo-600 p-3.5 rounded-2xl text-2xl mb-3 shadow-md border border-indigo-100">
+                        <i class="fa-solid fa-hotel"></i>
                     </div>
-                    <h2 class="text-xl font-bold text-slate-900">Welcome to Hotel RAKS</h2>
-                    <p class="text-xs text-slate-500 mt-1">Scan QR code or enter details to request room amenities & service.</p>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Welcome to Hotel RAKS</h2>
+                    <p class="text-xs font-medium text-slate-600 mt-1">Scan QR code or enter details to request room amenities & service.</p>
                 </div>
                 <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Guest Name</label>
-                        <input type="text" id="input-name" required autocomplete="off" spellcheck="false" placeholder="Enter your name" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Guest Name</label>
+                        <input type="text" id="input-name" required autocomplete="off" spellcheck="false" placeholder="Enter your name" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900 shadow-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1">Room Number</label>
-                        <input type="text" id="input-room" required autocomplete="off" spellcheck="false" placeholder="Enter room number" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Room Number</label>
+                        <input type="text" id="input-room" required autocomplete="off" spellcheck="false" placeholder="Enter room number" class="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900 shadow-sm">
                     </div>
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-lg shadow-indigo-600/30">
                         Enter Room Portal
                     </button>
                 </form>
@@ -70,89 +88,55 @@
 
             <!-- Ordering Interface -->
             <div id="guest-order-section" class="hidden space-y-6">
-                <div class="bg-indigo-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
+                <div class="bg-indigo-900 text-white rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
                     <div>
-                        <h2 class="text-lg font-bold">Popular Amenities & Requests</h2>
-                        <p class="text-xs text-indigo-200">Tap items below to add to your service request basket.</p>
+                        <h2 class="text-base sm:text-lg font-bold">Select Hotel Amenities & Requests</h2>
+                        <p class="text-xs text-indigo-200">Tap items below to add to your basket. Selected items highlight in green.</p>
                     </div>
                     <button onclick="logoutGuest()" class="text-xs bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl border border-white/20 transition">Change Room / Logout</button>
                 </div>
 
-                <!-- 2x3 Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="menu-grid">
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Mineral Water Bottle', 1)">
-                        <div class="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-droplet"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Mineral Water Bottle</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                <!-- Main Side-by-Side Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    
+                    <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="menu-grid">
+                        <!-- Dynamically rendered -->
                     </div>
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Fresh Bath Towel', 1)">
-                        <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-bath"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Fresh Bath Towel</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
-                    </div>
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Hot Coffee / Tea Set', 1)">
-                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-mug-hot"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Hot Coffee / Tea Set</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
-                    </div>
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Extra Pillow & Blanket', 1)">
-                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-bed"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Extra Pillow & Blanket</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
-                    </div>
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Toiletries Kit / Soap', 1)">
-                        <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-pump-soap"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Toiletries Kit / Soap</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
-                    </div>
-                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Evening Snacks Platter', 1)">
-                        <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-cookie-bite"></i></div>
-                        <h3 class="font-bold text-sm text-slate-900">Evening Snacks Platter</h3>
-                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
-                    </div>
-                </div>
 
-                <!-- Selected Basket & Submit -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
-                        <h3 class="font-bold text-sm text-slate-900 flex items-center space-x-2">
-                            <i class="fa-solid fa-basket-shopping text-indigo-600"></i>
-                            <span>Selected Items Basket</span>
-                        </h3>
-                        <div id="cart-items-container" class="divide-y divide-slate-100 max-h-40 overflow-y-auto">
-                            <p class="text-xs text-slate-400 py-3 text-center">No items selected yet. Tap above items.</p>
+                    <div class="space-y-4 lg:sticky lg:top-20">
+                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+                            <h3 class="font-bold text-sm text-slate-900 flex items-center space-x-2">
+                                <i class="fa-solid fa-basket-shopping text-indigo-600"></i>
+                                <span>Selected Items Basket</span>
+                            </h3>
+                            <div id="cart-items-container" class="divide-y divide-slate-100 max-h-56 overflow-y-auto">
+                                <p class="text-xs text-slate-400 py-3 text-center">No items selected yet.</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-700 mb-1">Special Request Note (Optional)</label>
+                                <input type="text" id="custom-note" autocomplete="off" spellcheck="false" placeholder="e.g., Deliver urgently..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-indigo-600 text-slate-900">
+                            </div>
+                            <button onclick="submitOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-bell"></i>
+                                <span>Trigger Staff Alarm</span>
+                            </button>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Special Request Note (Optional)</label>
-                            <input type="text" id="custom-note" autocomplete="off" spellcheck="false" placeholder="e.g., Deliver urgently..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-indigo-600 text-slate-900">
+
+                        <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+                            <h3 class="font-bold text-sm text-slate-900">Your Active Requests</h3>
+                            <div id="guest-orders-list" class="space-y-2">
+                                <p class="text-xs text-slate-400">No active orders right now.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
-                        <div>
-                            <h3 class="font-bold text-sm text-slate-900 mb-1">Send Request</h3>
-                            <p class="text-xs text-slate-500">Triggers continuous alarm at staff hub instantly.</p>
-                        </div>
-                        <button onclick="submitOrder()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-bell"></i>
-                            <span>Trigger Staff Alarm</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Active Orders Track -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
-                    <h3 class="font-bold text-sm text-slate-900">Your Active Requests & Status</h3>
-                    <div id="guest-orders-list" class="space-y-2">
-                        <p class="text-xs text-slate-400">No active orders right now.</p>
-                    </div>
                 </div>
             </div>
 
         </div>
 
         <!-- STAFF DASHBOARD VIEW -->
-        <div id="view-staff" class="hidden space-y-6">
+        <div id="view-staff" class="hidden space-y-6 w-full">
             <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
                 <div>
                     <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
@@ -179,7 +163,12 @@
 
             <!-- Completed History -->
             <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Delivered History Log</h3>
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Delivered History Log</h3>
+                    <button onclick="clearAllHistory()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold px-3 py-1.5 rounded-xl border border-rose-200 transition">
+                        <i class="fa-solid fa-trash-can mr-1"></i> Clear All History
+                    </button>
+                </div>
                 <div id="staff-history-list" class="space-y-2">
                     <p class="text-xs text-slate-400">No history records yet.</p>
                 </div>
@@ -195,7 +184,7 @@
         </span>
     </footer>
 
-    <!-- JavaScript with Instant Optimistic UI & Cloud Sync -->
+    <!-- JavaScript -->
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKVoG474lNFPYlp-tXXuymFGUqIYTntnqzBDwXoUArL2RMLi6SDL_Hep761bi7wSzqCg/exec";
         let currentGuest = null;
@@ -204,13 +193,35 @@
         let alarmEnabled = true;
         let audioInterval = null;
 
+        // Video Logo Loop Handler (05s to 10s)
+        const logoVideo = document.getElementById('logo-video');
+        if (logoVideo) {
+            logoVideo.addEventListener('timeupdate', function() {
+                if (logoVideo.currentTime >= 10.0) {
+                    logoVideo.currentTime = 5.0;
+                    logoVideo.play();
+                }
+            });
+            logoVideo.addEventListener('loadedmetadata', function() {
+                logoVideo.currentTime = 5.0;
+            });
+        }
+
+        const menuItemsList = [
+            { name: 'Mineral Water Bottle', icon: 'fa-droplet', color: 'sky' },
+            { name: 'Fresh Bath Towel', icon: 'fa-bath', color: 'indigo' },
+            { name: 'Hot Coffee / Tea Set', icon: 'fa-mug-hot', color: 'amber' },
+            { name: 'Extra Pillow & Blanket', icon: 'fa-bed', color: 'purple' },
+            { name: 'Toiletries Kit / Soap', icon: 'fa-pump-soap', color: 'rose' },
+            { name: 'Evening Snacks Platter', icon: 'fa-cookie-bite', color: 'orange' }
+        ];
+
         async function fetchOrdersFromCloud() {
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL);
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data)) {
-                        // Only sync if no local pending changes to avoid overriding active UI states
                         orders = data;
                         if (localStorage.getItem('is_staff') === 'true') {
                             renderStaffDashboard();
@@ -244,12 +255,42 @@
 
         window.onload = async function() {
             await fetchOrdersFromCloud();
+            renderMenuGrid();
             if (localStorage.getItem('is_staff') === 'true') {
                 openStaffDashboard();
             } else {
                 checkAlarmStatus();
             }
         };
+
+        function renderMenuGrid() {
+            const grid = document.getElementById('menu-grid');
+            if (!grid) return;
+            grid.innerHTML = menuItemsList.map(item => {
+                const inCart = cart.find(c => c.name === item.name);
+                const cardStyle = inCart 
+                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg scale-[1.02]' 
+                    : 'bg-white border-slate-200/90 text-slate-900 hover:border-emerald-400 hover:shadow-md';
+                
+                const iconBox = inCart
+                    ? 'bg-white/20 text-white'
+                    : `bg-${item.color}-50 text-${item.color}-500`;
+
+                const subText = inCart 
+                    ? `<p class="text-xs font-semibold text-emerald-100 mt-2"><i class="fa-solid fa-check"></i> Selected (${inCart.qty})</p>`
+                    : `<p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>`;
+
+                return `
+                    <div class="border rounded-2xl p-4 flex flex-col items-center text-center transition cursor-pointer ${cardStyle}" onclick="addToCart('${item.name}', 1)">
+                        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm ${iconBox}">
+                            <i class="fa-solid ${item.icon}"></i>
+                        </div>
+                        <h3 class="font-bold text-sm">${item.name}</h3>
+                        ${subText}
+                    </div>
+                `;
+            }).join('');
+        }
 
         function promptStaffLogin() {
             const pin = prompt("Enter Staff Password:");
@@ -341,6 +382,7 @@
             const badge = document.getElementById('guest-badge');
             document.getElementById('badge-info').innerText = `Room ${room} (${name})`;
             badge.classList.remove('hidden');
+            renderMenuGrid();
             renderGuestOrders();
         }
 
@@ -352,6 +394,7 @@
             document.getElementById('guest-badge').classList.add('hidden');
             document.getElementById('input-name').value = '';
             document.getElementById('input-room').value = '';
+            renderMenuGrid();
         }
 
         function addToCart(itemName, qty) {
@@ -362,17 +405,19 @@
                 cart.push({ name: itemName, qty: qty });
             }
             renderCart();
+            renderMenuGrid();
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
             renderCart();
+            renderMenuGrid();
         }
 
         function renderCart() {
             const container = document.getElementById('cart-items-container');
             if (cart.length === 0) {
-                container.innerHTML = '<p class="text-xs text-slate-400 py-3 text-center">No items selected yet. Tap above items.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 py-3 text-center">No items selected yet.</p>';
                 return;
             }
             container.innerHTML = cart.map((item, idx) => `
@@ -402,18 +447,17 @@
                 status: 'Pending'
             };
 
-            // Instant Local Update
             orders.unshift(newOrder);
             cart = [];
             document.getElementById('custom-note').value = '';
             renderCart();
+            renderMenuGrid();
             renderGuestOrders();
             checkAlarmStatus();
             
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
             alert('Order sent successfully! Staff alarm triggered.');
 
-            // Background Cloud Save
             await saveOrdersToCloud(orders);
         }
 
@@ -443,16 +487,27 @@
         }
 
         async function updateOrderStatus(orderId, newStatus) {
-            // Instant Local UI Update (Zero Delay)
             const order = orders.find(o => o.id === orderId);
             if (order) {
                 order.status = newStatus;
                 renderStaffDashboard();
                 checkAlarmStatus();
             }
-
-            // Background Cloud Save
             await saveOrdersToCloud(orders);
+        }
+
+        async function deleteHistoryItem(orderId) {
+            orders = orders.filter(o => o.id !== orderId);
+            renderStaffDashboard();
+            await saveOrdersToCloud(orders);
+        }
+
+        async function clearAllHistory() {
+            if (confirm("Are you sure you want to clear all delivered history records?")) {
+                orders = orders.filter(o => o.status !== 'Delivered');
+                renderStaffDashboard();
+                await saveOrdersToCloud(orders);
+            }
         }
 
         function renderStaffDashboard() {
@@ -516,7 +571,12 @@
                             <span class="font-bold text-slate-900">Room ${o.room} (${o.guestName})</span>
                             <span class="text-slate-500 ml-2">&bull; #${o.id} &bull; ${o.items.map(i => i.qty + 'x ' + i.name).join(', ')}</span>
                         </div>
-                        <span class="text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">Delivered</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">Delivered</span>
+                            <button onclick="deleteHistoryItem('${o.id}')" class="text-rose-500 hover:text-rose-700 px-2 py-1 transition" title="Delete record">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
             }
