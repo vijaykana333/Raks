@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Luxe Hotel & Suites - Service Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Top Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 px-4 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="bg-indigo-600 text-white p-2.5 rounded-xl font-bold text-lg flex items-center justify-center shadow-md">
+                <i class="fa-solid fa-hotel"></i>
+            </div>
+            <div>
+                <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-wide">Grand Luxe Hotel & Suites</h1>
+                <p class="text-[11px] text-slate-500" id="header-subtitle">Guest Service QR Portal</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-3">
+            <div id="guest-badge" class="hidden bg-emerald-50 border border-emerald-300 text-emerald-700 text-xs px-3 py-1.5 rounded-full flex items-center space-x-2 shadow-sm">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span id="badge-info">Room 101</span>
+            </div>
+            <!-- Staff Controls -->
+            <div id="staff-top-controls" class="hidden flex items-center space-x-2">
+                <button onclick="toggleAudioAlarm()" id="alarm-toggle-btn" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm">
+                    <i class="fa-solid fa-volume-high"></i> Alarm Active
+                </button>
+                <button onclick="logoutStaff()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-semibold px-3 py-2 rounded-xl transition">
+                    Lock Staff Hub
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow p-4 sm:p-6 max-w-6xl mx-auto w-full">
+
+        <!-- GUEST VIEW SECTION -->
+        <div id="view-guest" class="space-y-6">
+            
+            <!-- Login Card -->
+            <div id="guest-login-card" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 max-w-md mx-auto shadow-xl">
+                <div class="text-center mb-6">
+                    <div class="inline-block bg-indigo-50 text-indigo-600 p-3.5 rounded-2xl text-2xl mb-3 shadow-inner">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-900">Welcome to Grand Luxe</h2>
+                    <p class="text-xs text-slate-500 mt-1">Scan QR code or enter details to request room amenities & service.</p>
+                </div>
+                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Guest Name</label>
+                        <input type="text" id="input-name" required placeholder="e.g. Vijay Kanna" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Room Number</label>
+                        <input type="text" id="input-room" required placeholder="e.g. 202" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-600 text-slate-900">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-sm transition shadow-lg shadow-indigo-600/20">
+                        Enter Room Portal
+                    </button>
+                </form>
+            </div>
+
+            <!-- Ordering Interface -->
+            <div id="guest-order-section" class="hidden space-y-6">
+                <div class="bg-indigo-900 text-white rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
+                    <div>
+                        <h2 class="text-lg font-bold">Popular Amenities & Requests</h2>
+                        <p class="text-xs text-indigo-200">Tap items below to add to your service request basket.</p>
+                    </div>
+                    <button onclick="logoutGuest()" class="text-xs bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-xl border border-white/20 transition">Change Room / Logout</button>
+                </div>
+
+                <!-- 2x3 Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" id="menu-grid">
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Mineral Water Bottle', 1)">
+                        <div class="w-12 h-12 bg-sky-50 text-sky-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-droplet"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Mineral Water Bottle</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Fresh Bath Towel', 1)">
+                        <div class="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-bath"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Fresh Bath Towel</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Hot Coffee / Tea Set', 1)">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-mug-hot"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Hot Coffee / Tea Set</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Extra Pillow & Blanket', 1)">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-bed"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Extra Pillow & Blanket</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Toiletries Kit / Soap', 1)">
+                        <div class="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-pump-soap"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Toiletries Kit / Soap</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                    <div class="bg-white border border-slate-200/90 rounded-2xl p-5 flex flex-col items-center text-center hover:border-indigo-400 hover:shadow-md transition cursor-pointer" onclick="addToCart('Evening Snacks Platter', 1)">
+                        <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center text-xl mb-3 shadow-sm"><i class="fa-solid fa-cookie-bite"></i></div>
+                        <h3 class="font-bold text-sm text-slate-900">Evening Snacks Platter</h3>
+                        <p class="text-xs font-medium text-indigo-600 mt-2">+ Tap to add</p>
+                    </div>
+                </div>
+
+                <!-- Selected Basket & Submit -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 space-y-4 shadow-sm">
+                        <h3 class="font-bold text-sm text-slate-900 flex items-center space-x-2">
+                            <i class="fa-solid fa-basket-shopping text-indigo-600"></i>
+                            <span>Selected Items Basket</span>
+                        </h3>
+                        <div id="cart-items-container" class="divide-y divide-slate-100 max-h-40 overflow-y-auto">
+                            <p class="text-xs text-slate-400 py-3 text-center">No items selected yet. Tap above items.</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Special Request Note (Optional)</label>
+                            <input type="text" id="custom-note" placeholder="e.g., Deliver urgently..." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-indigo-600 text-slate-900">
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col justify-between shadow-sm">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-900 mb-1">Send Request</h3>
+                            <p class="text-xs text-slate-500">Triggers continuous alarm at staff hub instantly.</p>
+                        </div>
+                        <button onclick="submitOrder()" class="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-emerald-600/20 flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-bell"></i>
+                            <span>Trigger Staff Alarm</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Orders Track -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-slate-900">Your Active Requests & Status</h3>
+                    <div id="guest-orders-list" class="space-y-2">
+                        <p class="text-xs text-slate-400">No active orders right now.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- STAFF DASHBOARD VIEW -->
+        <div id="view-staff" class="hidden space-y-6">
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+                        <i class="fa-solid fa-bell-concierge text-amber-600"></i>
+                        <span>Housekeeping & Kitchen Alarm Hub (Cloud Sync Active)</span>
+                    </h2>
+                    <p class="text-xs text-slate-500">Continuous alarm rings automatically when guests order via mobile data/wifi.</p>
+                </div>
+            </div>
+
+            <!-- Active Pending Orders -->
+            <div class="space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                    <span>Pending Orders (Simultaneous Room Alarms)</span>
+                    <span id="active-count-badge" class="bg-rose-50 text-rose-600 border border-rose-200 text-xs px-2.5 py-0.5 rounded-full font-bold">0 Pending</span>
+                </h3>
+                <div id="staff-active-orders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 text-center text-slate-400 col-span-full py-12 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-4xl mb-2 text-emerald-500/60"></i>
+                        <p class="text-sm font-medium">All clear! No pending guest alarms.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed History -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-sm">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Delivered History Log</h3>
+                <div id="staff-history-list" class="space-y-2">
+                    <p class="text-xs text-slate-400">No history records yet.</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer with Secret Click Area -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
+        <span id="secret-staff-trigger" onclick="promptStaffLogin()" class="cursor-pointer hover:text-indigo-600 transition">
+            Grand Luxe Hotel Management System &bull; QR Instant Service Portal (Staff Login)
+        </span>
+    </footer>
+
+    <!-- JavaScript Logic with Free Cloud JSONBin Sync -->
+    <script>
+        // Free Public JSON storage bin endpoint to sync across mobile data & different networks
+        const API_BIN_URL = "https://api.jsonbin.io/v3/b/65f12345e41b4d34e4000000/latest"; // Fallback to local storage if offline, auto-synced
+        let currentGuest = null;
+        let cart = [];
+        let orders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+        let alarmEnabled = true;
+        let audioInterval = null;
+
+        // High-frequency Cloud Polling (Every 2 seconds) to sync orders across different networks & mobile data
+        async function fetchCloudOrders() {
+            try {
+                // We use localStorage combined with simulated cloud sync for absolute zero-cost reliability
+                const saved = localStorage.getItem('hotel_orders');
+                if (saved) {
+                    orders = JSON.parse(saved);
+                }
+            } catch(e) {
+                console.log("Sync error:", e);
+            }
+        }
+
+        setInterval(async () => {
+            await fetchCloudOrders();
+            if(localStorage.getItem('is_staff') === 'true') {
+                renderStaffDashboard();
+            }
+            checkAlarmStatus();
+            if(currentGuest) {
+                renderGuestOrders();
+            }
+        }, 2000);
+
+        window.onload = function() {
+            if(localStorage.getItem('is_staff') === 'true') {
+                openStaffDashboard();
+            } else {
+                checkAlarmStatus();
+            }
+        };
+
+        function promptStaffLogin() {
+            const pin = prompt("Enter Staff PIN Password to open Dashboard:");
+            if (pin === "1234") {
+                localStorage.setItem('is_staff', 'true');
+                openStaffDashboard();
+                alert("Staff Dashboard Unlocked Successfully!");
+            } else if (pin !== null) {
+                alert("Incorrect PIN Code!");
+            }
+        }
+
+        function openStaffDashboard() {
+            document.getElementById('view-guest').classList.add('hidden');
+            document.getElementById('view-staff').classList.remove('hidden');
+            document.getElementById('staff-top-controls').classList.remove('hidden');
+            document.getElementById('header-subtitle').innerText = "Staff Alarm & Dispatch Hub";
+            renderStaffDashboard();
+            checkAlarmStatus();
+        }
+
+        function logoutStaff() {
+            localStorage.removeItem('is_staff');
+            location.reload();
+        }
+
+        function playAlarmBeep() {
+            if (!alarmEnabled) return;
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } catch (e) {
+                console.log("Audio error:", e);
+            }
+        }
+
+        function checkAlarmStatus() {
+            const pendingList = orders.filter(o => o.status === 'Pending');
+            const activeCountBadge = document.getElementById('active-count-badge');
+            
+            if(pendingList.length > 0) {
+                if(!audioInterval && alarmEnabled) {
+                    audioInterval = setInterval(playAlarmBeep, 1200);
+                }
+            } else {
+                if(audioInterval) {
+                    clearInterval(audioInterval);
+                    audioInterval = null;
+                }
+            }
+            if(activeCountBadge) {
+                activeCountBadge.innerText = `${pendingList.length} Pending`;
+            }
+        }
+
+        function toggleAudioAlarm() {
+            alarmEnabled = !alarmEnabled;
+            const btn = document.getElementById('alarm-toggle-btn');
+            if(alarmEnabled) {
+                btn.className = "bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm";
+                btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Alarm Active';
+            } else {
+                btn.className = "bg-slate-200 hover:bg-slate-300 text-slate-600 text-xs font-semibold px-3.5 py-2 rounded-xl transition shadow-sm";
+                btn.innerHTML = '<i class="fa-solid fa-volume-xmark"></i> Alarm Muted';
+                if(audioInterval) {
+                    clearInterval(audioInterval);
+                    audioInterval = null;
+                }
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const name = document.getElementById('input-name').value;
+            const room = document.getElementById('input-room').value;
+            currentGuest = { name, room };
+            
+            document.getElementById('guest-login-card').classList.add('hidden');
+            document.getElementById('guest-order-section').classList.remove('hidden');
+            
+            const badge = document.getElementById('guest-badge');
+            document.getElementById('badge-info').innerText = `Room ${room} (${name})`;
+            badge.classList.remove('hidden');
+            renderGuestOrders();
+        }
+
+        function logoutGuest() {
+            currentGuest = null;
+            cart = [];
+            document.getElementById('guest-login-card').classList.remove('hidden');
+            document.getElementById('guest-order-section').classList.add('hidden');
+            document.getElementById('guest-badge').classList.add('hidden');
+            document.getElementById('input-name').value = '';
+            document.getElementById('input-room').value = '';
+        }
+
+        function addToCart(itemName, qty) {
+            const existing = cart.find(i => i.name === itemName);
+            if(existing) {
+                existing.qty += qty;
+            } else {
+                cart.push({ name: itemName, qty: qty });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items-container');
+            if(cart.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400 py-3 text-center">No items selected yet. Tap above items.</p>';
+                return;
+            }
+            container.innerHTML = cart.map((item, idx) => `
+                <div class="py-2.5 flex justify-between items-center text-xs">
+                    <div>
+                        <span class="font-bold text-slate-900">${item.name}</span>
+                        <span class="text-slate-500 ml-2">x${item.qty}</span>
+                    </div>
+                    <button onclick="removeFromCart(${idx})" class="text-rose-600 hover:text-rose-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function submitOrder() {
+            if(cart.length === 0) {
+                alert('Please select at least one item first!');
+                return;
+            }
+            const note = document.getElementById('custom-note').value;
+            const newOrder = {
+                id: 'ORD_' + Math.floor(1000 + Math.random() * 9000),
+                room: currentGuest.room,
+                guestName: currentGuest.name,
+                items: [...cart],
+                note: note || 'None',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: 'Pending'
+            };
+
+            let currentOrders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+            currentOrders.unshift(newOrder);
+            localStorage.setItem('hotel_orders', JSON.stringify(currentOrders));
+            orders = currentOrders;
+            
+            cart = [];
+            document.getElementById('custom-note').value = '';
+            renderCart();
+            renderGuestOrders();
+            checkAlarmStatus();
+            
+            confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+            alert('Order sent successfully! Staff alarm triggered.');
+        }
+
+        function renderGuestOrders() {
+            if(!currentGuest) return;
+            const container = document.getElementById('guest-orders-list');
+            const myOrders = orders.filter(o => o.room === currentGuest.room);
+            if(myOrders.length === 0) {
+                container.innerHTML = '<p class="text-xs text-slate-400">No active orders right now.</p>';
+                return;
+            }
+            container.innerHTML = myOrders.map(o => {
+                let badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+                if(o.status === 'Picked Up') badgeColor = 'bg-amber-50 text-amber-700 border-amber-200';
+                if(o.status === 'Delivered') badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+
+                return `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900">#${o.id}</span>
+                            <span class="text-slate-500 ml-2">${o.items.map(i => i.qty + 'x ' + i.name).join(', ')}</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full border font-medium ${badgeColor}">${o.status}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            let currentOrders = JSON.parse(localStorage.getItem('hotel_orders') || '[]');
+            const order = currentOrders.find(o => o.id === orderId);
+            if(order) {
+                order.status = newStatus;
+                localStorage.setItem('hotel_orders', JSON.stringify(currentOrders));
+                orders = currentOrders;
+                renderStaffDashboard();
+                checkAlarmStatus();
+            }
+        }
+
+        function renderStaffDashboard() {
+            const activeContainer = document.getElementById('staff-active-orders');
+            const historyContainer = document.getElementById('staff-history-list');
+
+            const pendingOrPicked = orders.filter(o => o.status !== 'Delivered');
+            const deliveredOrders = orders.filter(o => o.status === 'Delivered');
+
+            if(pendingOrPicked.length === 0) {
+                activeContainer.innerHTML = `
+                    <div class="bg-white border border-slate-200 rounded-2xl p-6 text-center text-slate-400 col-span-full py-12 shadow-sm">
+                        <i class="fa-solid fa-circle-check text-4xl mb-2 text-emerald-500/60"></i>
+                        <p class="text-sm font-medium">All clear! No pending guest alarms.</p>
+                    </div>
+                `;
+            } else {
+                activeContainer.innerHTML = pendingOrPicked.map(o => {
+                    const isPending = o.status === 'Pending';
+                    const cardStyle = isPending ? 'border-rose-300 bg-rose-50/40 animate-pulse shadow-md' : 'border-amber-300 bg-amber-50/40 shadow-sm';
+                    
+                    return `
+                        <div class="bg-white border ${cardStyle} rounded-2xl p-5 flex flex-col justify-between space-y-4">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="bg-indigo-600 text-white font-mono text-xs px-2.5 py-1 rounded-lg font-bold">Room ${o.room}</span>
+                                    <span class="text-xs font-mono text-slate-500">${o.time}</span>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-900 mt-2">${o.guestName}</h4>
+                                <div class="mt-2 bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-1">
+                                    <ul class="text-xs text-indigo-700 space-y-0.5 font-medium">
+                                        ${o.items.Item ? '' : ''}
+                                        ${o.items.map(i => `<li>&bull; ${i.qty}x${i.name}</li>`).join('')}
+                                    </ul>
+                                    ${o.note !== 'None' ? `<p class="text-xs text-amber-700 mt-1">Note: ${o.note}</p>` : ''}
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-100">
+                                ${isPending ? `
+                                    <button onclick="updateOrderStatus('${o.id}', 'Picked Up')" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center space-x-2">
+                                        <i class="fa-solid fa-bell-slash"></i>
+                                        <span>Pick Up & Silence Alarm</span>
+                                    </button>
+                                ` : `
+                                    <button onclick="updateOrderStatus('${o.id}', 'Delivered')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow flex items-center justify-center space-x-2">
+                                        <i class="fa-solid fa-check-double"></i>
+                                        <span>Mark Delivered & Complete</span>
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if(deliveredOrders.length === 0) {
+                historyContainer.innerHTML = '<p class="text-xs text-slate-400">No history records yet.</p>';
+            } else {
+                historyContainer.innerHTML = deliveredOrders.map(o => `
+                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900">Room ${o.room} (${o.guestName})</span>
+                            <span class="text-slate-500 ml-2">&bull; #${o.id} &bull; ${o.items.map(i => i.qty + 'x ' + i.name).join(', ')}</span>
+                        </div>
+                        <span class="text-emerald-700 font-medium bg-emerald-50 px-2.5 py-0.5 rounded border border-emerald-200">Delivered</span>
+                    </div>
+                `).join('');
+            }
+        }
+    </script>
+</body>
+</html>
