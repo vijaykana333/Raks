@@ -188,14 +188,14 @@
 
     </main>
 
-    <!-- Footer with Secret Click Area (No Staff Login text shown) -->
+    <!-- Footer with Secret Click Area -->
     <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 mt-auto">
         <span id="secret-staff-trigger" onclick="promptStaffLogin()" class="cursor-pointer hover:text-indigo-600 transition">
             Hotel RAKS Tanjore &bull; QR Instant Service Portal
         </span>
     </footer>
 
-    <!-- JavaScript with Google Apps Script Web App API Integration -->
+    <!-- JavaScript with Instant Optimistic UI & Cloud Sync -->
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKVoG474lNFPYlp-tXXuymFGUqIYTntnqzBDwXoUArL2RMLi6SDL_Hep761bi7wSzqCg/exec";
         let currentGuest = null;
@@ -210,6 +210,7 @@
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data)) {
+                        // Only sync if no local pending changes to avoid overriding active UI states
                         orders = data;
                         if (localStorage.getItem('is_staff') === 'true') {
                             renderStaffDashboard();
@@ -401,10 +402,8 @@
                 status: 'Pending'
             };
 
-            let currentOrders = [...orders];
-            currentOrders.unshift(newOrder);
-            await saveOrdersToCloud(currentOrders);
-            
+            // Instant Local Update
+            orders.unshift(newOrder);
             cart = [];
             document.getElementById('custom-note').value = '';
             renderCart();
@@ -412,8 +411,10 @@
             checkAlarmStatus();
             
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
-            alert('Order sent successfully! Staff alarm triggered across all phones.');
-            setTimeout(fetchOrdersFromCloud, 1000);
+            alert('Order sent successfully! Staff alarm triggered.');
+
+            // Background Cloud Save
+            await saveOrdersToCloud(orders);
         }
 
         function renderGuestOrders() {
@@ -442,15 +443,16 @@
         }
 
         async function updateOrderStatus(orderId, newStatus) {
-            let currentOrders = [...orders];
-            const order = currentOrders.find(o => o.id === orderId);
+            // Instant Local UI Update (Zero Delay)
+            const order = orders.find(o => o.id === orderId);
             if (order) {
                 order.status = newStatus;
-                await saveOrdersToCloud(currentOrders);
                 renderStaffDashboard();
                 checkAlarmStatus();
-                setTimeout(fetchOrdersFromCloud, 1000);
             }
+
+            // Background Cloud Save
+            await saveOrdersToCloud(orders);
         }
 
         function renderStaffDashboard() {
