@@ -157,7 +157,7 @@
                 <div>
                     <h2 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
                         <i class="fa-solid fa-bell-concierge text-amber-600"></i>
-                        <span>Housekeeping & Kitchen Alarm Hub (Cross-Device Cloud Sync)</span>
+                        <span>Housekeeping & Kitchen Alarm Hub (Google Sheets Cloud Sync)</span>
                     </h2>
                     <p class="text-xs text-slate-500">Rings continuously across different mobile phones & networks automatically.</p>
                 </div>
@@ -195,20 +195,19 @@
         </span>
     </footer>
 
-    <!-- JavaScript Logic with Free Cross-Device Cloud API -->
+    <!-- JavaScript with Google Apps Script Web App API Integration -->
     <script>
-        // Using a public free JSON bin API endpoint so different phones sync orders seamlessly over mobile data/wifi
-        const CLOUD_BIN_URL = "https://json.npoint.io/400f8983e299c82c3531"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzKVoG474lNFPYlp-tXXuymFGUqIYTntnqzBDwXoUArL2RMLi6SDL_Hep761bi7wSzqCg/exec";
         let currentGuest = null;
         let cart = [];
         let orders = [];
         let alarmEnabled = true;
         let audioInterval = null;
 
-        // Fetch Orders from Cloud API every 2 seconds for Multi-Phone Realtime Sync
+        // Fetch Orders from Google Sheet Web App every 3 seconds for Live Cross-Device Sync
         async function fetchOrdersFromCloud() {
             try {
-                const response = await fetch(CLOUD_BIN_URL);
+                const response = await fetch(GOOGLE_SCRIPT_URL);
                 if (response.ok) {
                     const data = await response.json();
                     if (Array.isArray(data)) {
@@ -223,14 +222,15 @@
                     }
                 }
             } catch (e) {
-                console.log("Cloud sync fallback:", e);
+                console.log("Cloud sync fetch error:", e);
             }
         }
 
         async function saveOrdersToCloud(updatedOrders) {
             try {
-                await fetch(CLOUD_BIN_URL, {
+                await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(updatedOrders)
                 });
@@ -240,8 +240,8 @@
             }
         }
 
-        // Poll cloud every 2 seconds
-        setInterval(fetchOrdersFromCloud, 2000);
+        // Poll cloud every 3 seconds
+        setInterval(fetchOrdersFromCloud, 3000);
 
         window.onload = async function() {
             await fetchOrdersFromCloud();
@@ -415,6 +415,7 @@
             
             confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
             alert('Order sent successfully! Staff alarm triggered across all phones.');
+            setTimeout(fetchOrdersFromCloud, 1000);
         }
 
         function renderGuestOrders() {
@@ -450,6 +451,7 @@
                 await saveOrdersToCloud(currentOrders);
                 renderStaffDashboard();
                 checkAlarmStatus();
+                setTimeout(fetchOrdersFromCloud, 1000);
             }
         }
 
